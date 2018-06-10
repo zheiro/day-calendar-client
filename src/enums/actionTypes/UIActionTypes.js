@@ -1,0 +1,10 @@
+const UIActionTypes = {
+	SHOW_MESSAGEBOX: '@@app/ui/SHOW_MESSAGEBOX',
+	HIDE_MESSAGEBOX: '@@app/ui/HIDE_MESSAGEBOX',
+	SHOW_SPINNER: '@@app/ui/SHOW_SPINNER',
+	HIDE_SPINNER: '@@app/ui/HIDE_SPINNER',
+	SET_REDIRECT_LINK: '@@action/ui/SET_REDIRECT_LINK',
+	REMOVE_REDIRECT_LINK: '@@action/ui/REMOVE_REDIRECT_LINK',
+};
+
+export default UIActionTypes;
