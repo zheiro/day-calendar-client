@@ -37,16 +37,17 @@ class DayCalendar extends Component {
 	async componentWillMount() {
 		if (!sessionStorage.getItem('@@mc/USERID')) {
 			this.props.history.push(Paths.LOGIN);
+		} else {
+			let segmentedSchedule = this._segmentSchedule(await this.props.getSchedule());
+
+			let morningActivities = this._mergeConflict(segmentedSchedule.morningActivities);
+			let afternoonActivities = this._mergeConflict(segmentedSchedule.afternoonActivities);
+
+			this.setState({
+				morningActivities: morningActivities,
+				afternoonActivities: afternoonActivities
+			})
 		}
-
-		let segmentedSchedule = this._segmentSchedule(await this.props.getSchedule());
-		let morningActivities = this._mergeConflict(segmentedSchedule.morningActivities);
-		let afternoonActivities = this._mergeConflict(segmentedSchedule.afternoonActivities);
-
-		this.setState({
-			morningActivities: morningActivities,
-			afternoonActivities: afternoonActivities
-		})
 	}
 
 	_mergeConflict(schedule) {
@@ -80,33 +81,36 @@ class DayCalendar extends Component {
 		let morningActivities = [];
 		let afternoonActivities = [];
 
-		for (let i = 0; i < schedule.length; i++) {
-			if (schedule[i].start < 300) {
-				if (schedule[i].start + schedule[i].duration < 300) {
-					morningActivities.push(schedule[i]);
+		if (schedule) {
+			for (let i = 0; i < schedule.length; i++) {
+				if (schedule[i].start < 300) {
+					if (schedule[i].start + schedule[i].duration < 300) {
+						morningActivities.push(schedule[i]);
+					} else {
+						let morningPart = {
+							...schedule[i],
+							duration: 300 - schedule[i].start,
+						}
+
+						let afterNoonPart = {
+							// start: 300,
+							...schedule[i],
+							start: 0,
+							duration: schedule[i].duration - (300 - schedule[i].start),
+						}
+
+						morningActivities.push(morningPart);
+						afternoonActivities.push(afterNoonPart);
+					}
 				} else {
-					let morningPart = {
-						...schedule[i],
-						duration: 300 - schedule[i].start,
-					}
-
-					let afterNoonPart = {
-						// start: 300,
-						...schedule[i],
-						start: 0,
-						duration: schedule[i].duration - (300 - schedule[i].start),
-					}
-
-					morningActivities.push(morningPart);
-					afternoonActivities.push(afterNoonPart);
+					schedule[i].start = schedule[i].start - 300;
+					afternoonActivities.push(schedule[i]);
 				}
-			} else {
-				schedule[i].start = schedule[i].start - 300;
-				afternoonActivities.push(schedule[i]);
 			}
+
+			return { morningActivities, afternoonActivities }
 		}
 
-		return { morningActivities, afternoonActivities }
 	}
 
 	render() {
