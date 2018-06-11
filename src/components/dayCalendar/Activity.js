@@ -41,7 +41,8 @@ export default class Activity extends Component {
 									height: (1.5 * act.duration),
 									marginTop: (1.515 * act.start),
 									width: (250 / this.props.activity.length),
-									zIndex: 100
+									zIndex: 100,
+									cursor: 'pointer'
 								}}>
 								<div
 									style={{
