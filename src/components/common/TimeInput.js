@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 
 const styles = {
 	tokenField: {
@@ -17,13 +18,17 @@ const styles = {
 
 };
 
+Array.prototype.insert = (index, item) => {
+	this.splice(index, 0, item);
+};
+
 export default class OTPForm extends Component {
 
 	constructor(props, context) {
 		super(props, context);
 		this.digitInputs = [];
 		this.state = {
-			time: '',
+			time: [0, 0, 0, 0],
 			changed: false
 		};
 	}
@@ -46,6 +51,28 @@ export default class OTPForm extends Component {
 		}
 	}
 
+	componentWillMount() {
+		if (this.props.initialTime) {
+			let time = this.props.initialTime + 480;
+			time = this.getTimeFromMins(time);
+			this.setState({
+				time: time.split("")
+			})
+
+		}
+	}
+
+
+
+	getTimeFromMins(mins) {
+		// if (mins >= 24 * 60 || mins < 0) {
+
+		// }
+		var h = mins / 60 | 0,
+			m = mins % 60 | 0;
+		return moment.utc().hours(h).minutes(m).format("hh:mm");
+	}
+
 
 	render() {
 		return (
@@ -65,7 +92,9 @@ export default class OTPForm extends Component {
 									key={i}
 									type="tel"
 									name={`digit${i}`}
-									value={null}
+									value={
+										this.state.time[i]
+									}
 									maxLength="1"
 									style={styles.digitInputBox}
 									ref={input => this.digitInputs[i] = input}
