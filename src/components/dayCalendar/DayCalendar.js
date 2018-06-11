@@ -5,7 +5,7 @@ import { TimeSlot, Activity } from '.';
 import { CalendarActions } from '../../actions';
 import { PromptBox, TimeInput } from '../common';
 import { TextField, FloatingActionButton } from 'material-ui';
-import ContentAdd from 'material-ui/svg-icons/content/add';
+import { ContentAdd, ActionGetApp } from 'material-ui/svg-icons/';
 import moment from 'moment';
 import MessageBox from '../common/MessageBox';
 import { Paths } from '../../enums';
@@ -164,9 +164,17 @@ class DayCalendar extends Component {
 						</div>
 						<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
 							<FloatingActionButton
+								style={{ margin: 10 }}
 								onClick={this._handleOpenAdd.bind(this)}
 							>
 								<ContentAdd />
+							</FloatingActionButton>
+							<FloatingActionButton
+								style={{ margin: 10 }}
+								secondary={true}
+								onClick={this._handleDownload.bind(this)}
+							>
+								<ActionGetApp />
 							</FloatingActionButton>
 						</div>
 					</div>
@@ -216,6 +224,25 @@ class DayCalendar extends Component {
 				</div>
 			</div>
 		)
+	}
+
+	_handleDownload() {
+		let schedule = this.props.schedule;
+
+		schedule.map((activity) => {
+			delete activity['calendarId'];
+			delete activity['userId'];
+			delete activity['createdAt'];
+			delete activity['updatedAt'];
+		})
+
+		let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schedule));
+		let downloadAnchorNode = document.createElement('a');
+		downloadAnchorNode.setAttribute("href", dataStr);
+		downloadAnchorNode.setAttribute("download", "my_day_schedule" + ".json");
+		document.body.appendChild(downloadAnchorNode); // required for firefox
+		downloadAnchorNode.click();
+		downloadAnchorNode.remove();
 	}
 
 	_handleEdit() {
